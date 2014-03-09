@@ -69,8 +69,7 @@ class MainHandler(webapp2.RequestHandler):
     <div class="navbar navbar-inverse navbar-fixed-top" id="my-navbar">
 
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle"
-          data-toggle="collapse" data-target=".navbar-collapse">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
           <span class="icon-bar"></span> <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
@@ -78,12 +77,12 @@ class MainHandler(webapp2.RequestHandler):
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="#home">01. Benvenuti</a></li>
-          <li><a href="#developer">02. Sviluppatori</a></li>
-          <li><a href="#people">03. Gruppo</a></li>
-          <li><a href="#work">04. Programma</a></li>
-          <li><a href="#who">05. Contatti</a></li>
-          <li><a href="#thanks">06. Grazie</a></li>
+          <li class="active"><a href="#home"><span class="G1">01</span>.Benvenuti</a></li>
+          <li><a href="#developer"><span class="O1">02.</span> Sviluppatori</a></li>
+          <li><a href="#people"><span class="O2">03.</span> Gruppo</a></li>
+          <li><a href="#work"><span class="G2">04.</span> Programma</a></li>
+          <li><a href="#indice"><span class="L">05.</span> Indice</a></li>
+          <li><a href="#thanks"><span class="E">06.</span> Grazie</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
@@ -91,7 +90,7 @@ class MainHandler(webapp2.RequestHandler):
   </div>
 
   <div class="full-panel" id="home">
-    <div id="copertina"><img src="img/gdg-pescara.png">Ciao mondo!</div>
+    <div id="copertina"><img src="img/gdg-pescara.png">Benvenuti!</div>
   </div>
 
   <div class="my-container">
@@ -100,7 +99,7 @@ class MainHandler(webapp2.RequestHandler):
         <div class="in-panel" id="developer">
           <h2>02. Sviluppatori</h2>
           <p>
-            <strong>Coloro che usano quotidianamente le
+            <strong class="O1">Coloro che usano quotidianamente le
               tecnologie di Google e vogliono condividere con te le loro
               esperienze.</strong>
                
@@ -127,7 +126,8 @@ class MainHandler(webapp2.RequestHandler):
             <i>wildcard-man</i> sono un mito, chiunque è interessato a
             offrire le propria disponibilità a far parte di questa
             squadra speciale, il core del gruppo, può candidarsi a non
-            più di tre tecnologie. Vedi <a href="#who">paragrafo 05</a>.
+            più di tre tecnologie.
+          </p>
         </div>
       </div>
 
@@ -136,8 +136,8 @@ class MainHandler(webapp2.RequestHandler):
         <div class="in-panel" id="people">
           <h2>03. Gruppo</h2>
           <p id="paper">
-            <strong>Partecipa, condividi.</strong>
-
+            <strong class="O2">Partecipa, condividi.</strong>
+            <br><br>
             <br>Un gruppo è un insieme di persone collegate da interessi comuni, ma non confondete l'interesse con la competenza specifica. 
             <br>In questo GDG ci teniamo a tenere distinto il "gruppo" dal "gruppo di sviluppatori".
             <br>L'interesse per certe tecnologie non deve essere limitato
@@ -158,7 +158,7 @@ class MainHandler(webapp2.RequestHandler):
         <div class="in-panel" id="work">
           <h2>04. Programma</h2>
           <p>
-            <strong>Condividere, inventare, sperimentare, crescere.</strong> 
+            <strong class="G2">Condividere, inventare, sperimentare, crescere.</strong> 
             <br> <br> Lo scopo primario del gruppo è la condivisione di esperienze sull'uso delle tecnologie di Google, nel fare questo
             cerca anche di essere un punto di riferimento per coloro che vogliono avvicinarsi a questo mondo. Quando possibile, alcuni volontari
             offrono la propria disponibilità a coloro che intraprendono per la prima volta una soluzione basata su tecnologie Google. 
@@ -179,41 +179,26 @@ class MainHandler(webapp2.RequestHandler):
       </div>
 
 
-      <div class="col-md-12 full-panel who">
-        <div class="in-panel" id="who">
-          <h2>05. Contatti</h2>
+      <div class="col-md-12 full-panel indice">
+        <div class="in-panel" id="indice">
+          <h2>05. Indice</h2>
           <p id="paper">
-             <b>Gestori GDG-PESCARA</b>
-             <br>Questo Google Developer Group è gestito da  <a href="https://sites.google.com/site/ozw1z5rd/">Alessio Palma</a> che può essere raggiunto al <a href="tel:+393498687665">349 8687665</a> ed 
-             <a href="mailto:antonello.pinnella@gmail.com">Antonello Pinnella</a>.
-             <br> 
-             <br><b>Mailing list</b>
-             <br>Questo gruppo possiede una mailing list, per essere un membro di questo gruppo è sufficiente iscriversi ad essa.<br>
-             L'indirizzo è <a href="mailto:gdg-pescara@googlegroups.com">gdg-pescara@googlegroups.com</a><br>
-             la pagina web corrispondente è <a href="https://groups.google.com/d/forum/gdg-pescara">https://groups.google.com/d/forum/gdg-pescara</a>.
-             <br>L'iscrizione non vincola in alcun modo e permette di avere aggiornamenti sulle attività del gruppo.
-             <br>La pagina su <a href="https://plus.google.com/109764437711338482169" rel="publisher">Google+</a>
+             <strong class="L">Registro attività, materiale, riferimenti</strong>
+             <br>Man mano che le varie attività inizieranno ad essere portate avanti, questa pagina indicizzerà le varie risorse disponibili 
+                 in rete. 
+                 Per adesso questo testo è un place holder che presto sarà sostituito dall'applicazione corrispondente.
              <br>
-             <br>
-             <b>Sito web</b> 
-             <br>Ti consigliamo di usare solo <a href="http://www.gdg-pescara.org">www.gdg-pescara.org</a> per accedere a questo sito. La url dell'applicazione potrebbe variare nel futuro.
-             <br>Il sito che stai visualizzando è ospitato sul Google App Engine ed il dominio ufficiale, per ora, fa un redirect verso l'indirizzo dell'applicazione (gdg-pescara.appspot.com)
-             <br>
-             <br><b>Sviluppatori</b>
-             <br>Non appena sarà possibile le informazioni di contatto saranno disponibili in home page, dove saranno presentate le icone cliccabili delle varie tecnologie disponibili.
-             
-             </p>               
-             
+          </p>   
         </div>
       </div>
 
       <div class="col-md-12 full-panel thanks">
         <div class="in-panel" id="thanks">
           <h2>06. Grazie</h2>
-          <p id="paper">
-             <br><i>Tutto quello che avete visto fino ad ora è stato reso possibile grazie all'aiuto di</i>
+          <p id="paper"> 
+             <br><strong class="E">Tutto quello che avete visto fino ad ora è stato reso possibile grazie all'aiuto di</strong>
              <br>
-             <br><b>Alfredo Morresi</b> di Google Italia per l'opportunità.
+             <br><b>Alfredo Morresi</b> di Google Italia che pazientemente ha accettato l'idea di aprire un capitolo a Pescara.
              <br><br>
              <b>Marialena Di Giantomasso</b> (paragrafi 01 e 05) e <b>Nino D'Angelo</b> (paragrafo 03) per aver concesso l'uso dei loro magnifici scatti su questo sito.
              <br>
@@ -231,11 +216,28 @@ class MainHandler(webapp2.RequestHandler):
     </div>
 
     <div class="col-md-12 full-panel footer">
-      <p>GDG-PESCARA.ORG</p>
+         <div class="col-md-6 ">
+             <p>
+             <strong>Risorse online</strong>
+             <br>Repository: <a href="https://code.google.com/p/gdg-pescara/">Google Code</a>
+             <br>Mailing list: <a href="https://groups.google.com/d/forum/gdg-pescara">Google Groups</a>
+             <br>Pagina G+: <a href="http://google.com/+Gdg-pescaraOrg">google.com/+Gdg-pescaraOrg</a>
+         </div>
+         <div class="col-md-6 ">
+             <p>
+             <strong>Legalese</strong>
+            <br><i>gdg-pescara è una associazione di appasionati di tecnologie Google, quanto prodotto o scritto non è assolutamente collegabile a Google ( la compagnia ).
+Disclaimer: GDG Pescara is an independent group; our activities and the opinions expressed here should in no way be linked to Google, the corporation.
+</i>
+            <br><br>
+             <strong>Gestori</strong>
+             <br>Alessio Palma  : <a href="https://plus.google.com/u/0/101892366399564359565/about">g+</a>  / <a href="https://sites.google.com/site/ozw1z5rd/">web</a> / <a href="tel:+393498687665">349 8687665</a> 
+             <br>Antonello Pinnella : <a href="https://plus.google.com/u/0/117706861419153572631/about">g+</a> / <a href="http://www.pinnellaweb.net/">web</a>
+         </div>
     </div>
 
+
   </div>
-  <!-- /.container -->
 
 
   <!-- Bootstrap core JavaScript
