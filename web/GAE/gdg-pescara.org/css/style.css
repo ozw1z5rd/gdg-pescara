@@ -150,18 +150,17 @@ cite a {
 .footer {
   background: #333;
   border: none;
-  height: 640px;
+  height: 540px;
 }
 
 .footer p {
   padding-top: 30px;
   font-size: 1.2em;
-  color: #777;
+  color: #00ebbe;
   width: 100%;
   font-weight: 100;
   text-align: left;
   clear: both;
-  text-shadow: -1px 1px 1px #000;
 }
 
 .indice h2 {
@@ -215,7 +214,7 @@ cite a {
   .footer p {
     padding-top: 30px;
     font-size: 1.2em;
-    color: #777;
+    color: #00ebbe;
     width: 100%;
     font-weight: 100;
     text-align: left;
