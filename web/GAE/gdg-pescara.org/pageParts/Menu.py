@@ -25,7 +25,7 @@ class Menu( object ):
 
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="#home"><span class="G1">01</span>.Benvenuti</a></li>
+          <li class="active"><a href="#home"><span class="G1">01</span>.Benvenuto</a></li>
           <li><a href="#developer"><span class="O1">02.</span> Sviluppatori</a></li>
           <li><a href="#people"><span class="O2">03.</span> Gruppo</a></li>
           <li><a href="#work"><span class="G2">04.</span> Programma</a></li>

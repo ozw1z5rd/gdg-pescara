@@ -13,9 +13,10 @@ from runOnce import Init
 
 app = webapp2.WSGIApplication(
          [ 
-   	      ( '/rest', Api ),  
-              ('/', Website),
-              ('/initialize', Init )
+   	      webapp2.Route(r'/rest/<entity>/<eid>', Api, name='single' ),  
+   	      webapp2.Route(r'/rest/<entity>', Api, name='list' ),  
+              webapp2.Route(r'/', Website, name='home'),
+              webapp2.Route(r'/initialize', Init, name='init' )
          ], 
-         debug=True
+         debug=False
       )

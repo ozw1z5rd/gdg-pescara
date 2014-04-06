@@ -47,3 +47,10 @@ class Paragraph( db.Model ):
     description = db.StringProperty()
     content = db.TextProperty()
 
+#
+# the index section
+#
+class Content(db.Model):
+    description=db.TextProperty()
+    reference=db.LinkProperty()
+   
