@@ -14,6 +14,7 @@ class WhatCode( object ):
     TEMPLATE_EMPTY               = '001'
     AUTH                         = '002'
     PARAMETER_ERROR              = '003'
+    PARSE_ERROR                  = '004'
 
 class WhyCode( object ):
     UNKNOWN                      = '001'
@@ -21,7 +22,9 @@ class WhyCode( object ):
     NO_VALID_USER_PROVIDED       = '003'
     MODEL_NOT_AVAILABLE          = '004'
     PARAMETER_VALUE_ERROR        = '005'
-
+    MALFORMED_JSON               = '006'
+    NOT_EXISTING_FIELD_IN_MODEL  = '007'
+    MISSING_ENTITY_ID            = '008'
 
 class DefaultException( endpoints.ServiceException ):
     def __init__(self, what, where, why):
