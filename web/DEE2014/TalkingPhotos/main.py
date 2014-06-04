@@ -18,24 +18,29 @@
 import webapp2
 from google.appengine.api import users
 from template.loginPageTemplate import LoginPageTemplate
+from template.homePageTemplate import HomePageTemplate
+import logging
+logging.basicConfig()
 
 class TalkingPhotos (webapp2.RequestHandler):
 
-    def homePage(self):
-        self.response.write("""
-<!DOCTYPE HTML>
-<html>
-</html>
-        """);
 
     def loginPage(self):
         login_url = users.create_login_url(self.request.path)
-        logout_url = users.create_logout_url(self.request.path)
-        page = LoginPageTemplate({ 'login' : login_url, 'logout' : logout_url })
-        return page.render()
+        page = LoginPageTemplate({ 'login' : login_url })
+        self.response.write( page.render() )
 
-    def authorizePage(self):
+    def homePage(self):
+        logout_url = users.create_logout_url(self.request.path)
+        nick = users.get_current_user().nickname()
+        page = HomePageTemplate({ 'logout' : logout_url, 'user': nick })
+        self.response.write( page.render() )
+
+    def visitorPage(self):
         pass
+
+    def allowed(self, who):
+        return True
 
     def get(self):
         user = users.get_current_user( )

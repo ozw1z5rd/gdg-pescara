@@ -1,6 +1,7 @@
 #
 # Very basic template system
 #
+import logging
 
 class TemplateBase( object ):
 
@@ -19,7 +20,7 @@ class TemplateBase( object ):
             suitable for your purposes.
         """
 
-    def head(self ):
+    def head(self):
         """
         return the page header section and starts the html
         """
@@ -50,14 +51,15 @@ class TemplateBase( object ):
         data = self.html()
         for key in self._dictionary.keys():
             value = self._dictionary[key]
-            data.replace( "{{"+key+"}}", value)
+            data = data.replace( "{{"+key+"}}", value)
         return data
 
     def render(self):
         """
         renders the template and store the result into the cache
         """
-        if not self._cacheValid:
+        logging.info("Entering render")
+        if self._cacheValid:
             return self._cache
         self._cache += self.head()
         self._cache += self.openBody()
@@ -72,6 +74,5 @@ class TemplateBase( object ):
         self._cacheValid = False
         self._dictionary = dictionary
 
-
     def __init__(self , dictionary ):
-        pass
+        self._dictionary = dictionary
