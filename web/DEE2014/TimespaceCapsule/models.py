@@ -33,6 +33,10 @@ class TimespaceCapsule(db.Model):
         self.user = user
         self.put()
 
+    def setNotified(self):
+        self.notifyDate = datetime.now()
+        self.put()
+
     def show(self):
         """
         Torna il contenuto e setta la capsula come vista

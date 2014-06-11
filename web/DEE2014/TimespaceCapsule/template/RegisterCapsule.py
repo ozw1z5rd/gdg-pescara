@@ -1,11 +1,5 @@
 from template import TemplateBase
 
-class RegisterCapsuleLoginTemplate(TemplateBase):
-    def html(self):
-        return """
-            Please login <a href="{{login}}">Click here to login</a>
-        """
-
 class RegisterCapsuleTemplate(TemplateBase):
     def html(self):
         return """

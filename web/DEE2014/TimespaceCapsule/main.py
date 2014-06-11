@@ -2,17 +2,17 @@
 # -*- coding: latin-1 -*-
 #
 import webapp2
-from models import *
+from models import TimespaceCapsule
 from google.appengine.api import users, mail
-from template import *
-from template.AddCapsule import *
-from template.OpenCapsule import *
-from template.RegisterCapsule import *
+from template.AddCapsule import AddCapsuleFormTemplate, AddCapsuleKoTemplate, AddCapsuleOkTemplate
+from template.OpenCapsule import OpenCapsuleTemplate
+from template.RegisterCapsule import RegisterCapsuleErrorTemplate, RegisterCapsuleTemplate
 from datetime import datetime
+from decorators import login_required
+from utilities import convert
 import logging
 
 logging.basicConfig()
-TIMEFORMAT = "%d/%m/%Y" # 31/01/2010
 
 class Home(webapp2.RequestHandler):
     pass
@@ -21,22 +21,21 @@ class OpenCapsule(webapp2.RequestHandler):
     """
     Gestisce l'apertura di una capsula
     """
+    @login_required
     def get(self):
         user = users.get_current_user()
         tscid = [int(self.request.get('tscid'))]
-        capsule = TimespaceCapsule().get(tscid)[0]
-        lat   = self.GET.get('lat')
-        lng   = self.GET.get('lng')
-        if capsule.requestOpen( user, lat, lng ) == TimespaceCapsule.TSC_OK:
+        capsule = TimespaceCapsule().get_by_id(tscid)[0]
+        lat   = convert(self.request, 'lat', 'float')
+        lng   = convert(self.request,'lng', 'float')
+        if capsule.requestToOpen( user, lat, lng ) == TimespaceCapsule.TSC_OK:
             page = OpenCapsuleTemplate({ 'content' : capsule.show() })
             return self.response.write( page.render())
-
 
 class Cron(webapp2.RequestHandler):
     """
     Gestisce il cron per l'invio dei messaggi
     """
-
     def _sendMail(self, capsule):
 
         body="You Got A Message From Past "
@@ -49,8 +48,8 @@ class Cron(webapp2.RequestHandler):
             sender="timespace_inc@noreply.com",
             to=capsule.user.email(),
             subject="You Got A Message From Past",
-            body=body
-            )
+            body=body )
+        capsule.setNotified()
         logging.info(body)
 
     def get(self):
@@ -69,29 +68,14 @@ class AddCapsule(webapp2.RequestHandler):
     Aggiunge una nuova capsula non registrata
     """
 
-    def convert(self, key, t):
-        value = self.request.get(key)
-        logging.info("%s %s" %( key, value) )
-        if value is None or len(value) == 0:
-            return None
-        if t == 'str':
-            return str(value)
-        elif t == 'float':
-            return float(value)
-        elif t == 'date':
-            return datetime.strptime(value, TIMEFORMAT )
-        return None
-
-        return self.request.get(key)
-
     def post(self):
         #TODO convertire il tempo in utc prima di memorizzarlo.
-        openDate = self.convert('txtOpenDate', 'date')
-        closeDate = self.convert('txtCloseDate', 'date')
-        content = self.convert('txtContent', 'str' )
-        lat = self.convert( 'txtLatitude', 'float')
-        lng = self.convert( 'txtLongitude', 'float')
-        tll = self.convert( 'txtTollerance', 'float')
+        openDate = convert(self.request,'txtOpenDate', 'date')
+        closeDate = convert(self.request,'txtCloseDate', 'date')
+        content = convert(self.request,'txtContent', 'str' )
+        lat = convert(self.request, 'txtLatitude', 'float')
+        lng = convert(self.request, 'txtLongitude', 'float')
+        tll = convert(self.request, 'txtTollerance', 'float')
         try:
             tsc =  TimespaceCapsule( openingDate = openDate,
                 closingDate=closeDate, content=content,
@@ -121,34 +105,39 @@ class RegisterCapsule(webapp2.RequestHandler):
     """
     Registra ( associa ) una capsula ad un utente
     """
+    @login_required
     def get(self):
+        tscid = [int(self.request.get('tscid'))]
         user = users.get_current_user()
-        if user is None:
-            loginUrl = users.create_login_url(dest_url='/register')
-            logging.info("login page, user is not logged")
-            page = RegisterCapsuleLoginTemplate({ 'login' : loginUrl })
-        else:
-            tscid = [int(self.request.get('tscid'))]
-            try:
-                capsule = TimespaceCapsule.get_by_id(tscid)[0]
-                logging.info(capsule)
-            except Exception as e:
-                logging.error(str(e))
-                capsule = None
+        try:
+            capsule = TimespaceCapsule.get_by_id(tscid)[0]
+            logging.info(capsule)
+        except Exception as e:
+            logging.error(str(e))
+            capsule = None
 
-            if capsule is None or capsule.user is not None:
-                message = 'Capsule not found'
-                if capsule.user is not None:
-                    message += ' already assigned, sorry'
-                page = RegisterCapsuleErrorTemplate({'message': message })
-            else:
-                capsule.user = user
-                capsule.notifyDate = datetime.now()
-                capsule.put()
-                logoutUrl = users.create_logout_url("/register" )
-                page = RegisterCapsuleTemplate({ 'logout' : logoutUrl })
+        if capsule is None or capsule.user is not None:
+            message = 'Capsule not found'
+            if capsule is not None:
+                message += ' becayse is already assigned, sorry'
+            page = RegisterCapsuleErrorTemplate({'message': message })
+        else:
+            capsule.user = user
+            capsule.notifyDate = datetime.now()
+            capsule.put()
+            self.notifyUser(capsule)
+            logoutUrl = users.create_logout_url("/register" )
+            page = RegisterCapsuleTemplate({ 'logout' : logoutUrl })
 
         self.response.write( page.render() )
+
+    def notifyUser(self, capsule ):
+        mail.send_mail(
+            sender="timespace_inc@noreply.com",
+            to=capsule.user.email(),
+            subject="Timespace capsule registered!",
+            body="""you will be notified about capsule opening"""
+            )
 
 app = webapp2.WSGIApplication([
     ('/', Home),
@@ -157,40 +146,3 @@ app = webapp2.WSGIApplication([
     ('/open', OpenCapsule ),
     ('/cron', Cron )
 ], debug=True )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
