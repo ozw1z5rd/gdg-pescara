@@ -1,6 +1,6 @@
 package org.gdgpescara.loversmirror;
 
-import android.app.ActionBar;
+import org.gdgpescara.loversmirror.R;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,8 +12,11 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -38,10 +41,16 @@ public class MainActivity extends Activity {
 	private Paint circlePaint = new Paint();
 	private Paint remoteCirclePaint = new Paint();
 
-	private Firebase firebaseme = new Firebase(FIREBASE_URL_ME);
-	private Firebase firebaseyou = new Firebase(FIREBASE_URL_YOU);
+	private Firebase firebasea = new Firebase(FIREBASE_URL_ME);
+	private Firebase firebaseb = new Firebase(FIREBASE_URL_YOU);
+	
+	private Firebase firebaseme = null;
+	private Firebase firebaseyou = null;
+	
 	private float displayW;
 	private float displayH;
+	
+	ValueEventListener valueEventListener;
 	
 	DrawingView dv;
 	
@@ -64,9 +73,9 @@ public class MainActivity extends Activity {
 	// vedi anche syncronizeStateWithRemote()
 	//
 	protected void setupFirebase() {
-		firebaseme.addValueEventListener(new ValueEventListener() {
-		    @Override
-		    public void onDataChange(DataSnapshot snap) {
+		valueEventListener = new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot snap) {
 		    	String message = String.format("%s",snap.getValue());
 		    	Log.i(TAG, message );
 		    	int length = message.length();
@@ -86,14 +95,17 @@ public class MainActivity extends Activity {
 		    	} 
 		    	else { 
 		    		remoteCircleToDraw = 0;
-		    		//force view redraw ( when invalid onDraw is called )
-		    		dv.invalidate();  
 		    	}
-		    }
+		    	//force view redraw ( when invalid onDraw is called )
+			    dv.invalidate();
+			}
 
-		    @Override public void onCancelled(FirebaseError error) { }
-		});
+			@Override public void onCancelled(FirebaseError error) { }
+		};
+		
+		firebaseyou.addValueEventListener( valueEventListener );
 	}
+	
 	
 	private int getRadiusValue( ) {
 		Display display = getWindowManager().getDefaultDisplay();
@@ -102,6 +114,55 @@ public class MainActivity extends Activity {
 		return Math.min(size.x, size.y) / 10;
 	}
 	
+	// Viene chiamato un tantum dal sistema per produrre il menu 
+	// per questa applicazione, ma se viene reso invalido con 
+	// invalidateMenuOptions, il sistema sarà costretto a 
+	// chiamarla di nuovo.
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.activity_main, menu);
+		if ( firebaseyou != null ) {
+			menu.findItem(R.id.idSetAsA).setVisible(false);
+			menu.findItem(R.id.idSetAsAB).setVisible(false);
+			menu.findItem(R.id.idSetAsB).setVisible(false);
+		}
+		return true;//ritorna true in modo da visualizzare il menu
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		
+		case R.id.idSetAsA:
+			firebaseme = firebasea;
+			firebaseyou = firebaseb;
+			setupFirebase();
+			invalidateOptionsMenu();
+			break;
+		
+		case R.id.idSetAsB:
+			firebaseme = firebaseb;
+			firebaseyou = firebasea;
+			setupFirebase();
+			invalidateOptionsMenu();
+			break;
+
+		case R.id.idSetAsAB:
+			firebaseme = firebasea;
+			firebaseyou = firebasea;
+			setupFirebase();
+			invalidateOptionsMenu();
+			break;
+			
+		case R.id.idFine:
+			finish();
+			break;
+		}
+	    return super.onOptionsItemSelected(item);
+	}   
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -109,11 +170,11 @@ public class MainActivity extends Activity {
 		radius = getRadiusValue();
 		setContentView(dv);
 		setupCirclePaint();
-		setupFirebase();
+		// inizializzazione del canale è fatto attraverso il menu
+		// setupFirebase();
 	}
 
-	
-	
+
 	//
 	// Questa è ad uso interno, riceve gli eventi touch e disegna sullo schermo
 	//
@@ -174,13 +235,17 @@ public class MainActivity extends Activity {
 		}
 
 		private void syncronizeStateWithRemote() {
-
+			// aspetta per l'inzializzazione dei canali
+			if ( firebaseme == null )
+				return;
+			
 			StringBuffer message = new StringBuffer("");
 			for ( int i = 0 ; i < circleToDraw; i++) {
 				message.append(
 					String.format("%04d%04d", 
 						(int)(mX[i]/displayW*10000), 
-						(int)(mY[i]/displayH*10000) 
+						// qualche volta mY > displayH
+						(int)(mY[i]/(1+Math.max(mY[i],displayH))*10000) 
 					)
 				);
 			}
@@ -210,7 +275,6 @@ public class MainActivity extends Activity {
 		@Override
 		public boolean onTouchEvent(MotionEvent event) {
 			int action = event.getAction() & MotionEvent.ACTION_MASK;
-			// indice del cursore che si è mosso ?
 			int pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 
 			int pointerCount = event.getPointerCount();

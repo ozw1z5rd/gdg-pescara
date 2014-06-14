@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<item
+    android:id="@+id/idSetAsA"
+    android:title="@string/strSetAsA"/>
+<item
+    android:id="@+id/idSetAsB"
+    android:title="@string/strSetAsB"/>
+<item
+    android:id="@+id/idSetAsAB"
+    android:title="@string/strSetAsAB"/>
+<item
+    android:id="@+id/idFine"
+    android:title="@string/strFine"/>
+</menu>

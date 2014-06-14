@@ -2,7 +2,8 @@
 <resources>
 
     <string name="app_name">LoversMirror</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-
+    <string name="strSetAsA">A side</string>
+    <string name="strSetAsB">B side</string>
+    <string name="strSetAsAB">A and B</string>
+	<string name="strFine">Quit</string>
 </resources>
