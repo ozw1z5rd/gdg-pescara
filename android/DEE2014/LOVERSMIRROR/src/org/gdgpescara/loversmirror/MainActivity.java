@@ -1,6 +1,6 @@
 package org.gdgpescara.loversmirror;
 
-
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -8,8 +8,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -20,14 +22,19 @@ import com.firebase.client.FirebaseError;
 
 public class MainActivity extends Activity {
 	final static int MAXTOUCHES = 10;
-	final static String TAG = "DEMO";
+	final static String TAG = "LOVERSMIRROR";
 
+	// Queste url sono associate ad un account free!
 	final static String FIREBASE_URL_ME = "https://sweltering-fire-220.firebaseio.com/me"; 
 	final static String FIREBASE_URL_YOU = "https://sweltering-fire-220.firebaseio.com/you";
+	// Posizione dita schermo remoto
 	private float[] rX = new float[MAXTOUCHES];
 	private float[] rY = new float[MAXTOUCHES];
-
 	private int remoteCircleToDraw = 0;
+	
+	private int radius;
+	
+	// strutture descrittive della modalità di disegno delle dita locali e remote
 	private Paint circlePaint = new Paint();
 	private Paint remoteCirclePaint = new Paint();
 
@@ -35,6 +42,8 @@ public class MainActivity extends Activity {
 	private Firebase firebaseyou = new Firebase(FIREBASE_URL_YOU);
 	private float displayW;
 	private float displayH;
+	
+	DrawingView dv;
 	
 	protected void setupCirclePaint() {
 		circlePaint.setAntiAlias(true);
@@ -48,46 +57,59 @@ public class MainActivity extends Activity {
 		remoteCirclePaint.setStrokeJoin(Paint.Join.MITER);
 		remoteCirclePaint.setStrokeWidth(5f);
 	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		DrawingView dv = new DrawingView(this);
-		setContentView(dv);
-		setupCirclePaint();
-
-		rX[0] = 100.0f;
-		rY[0] = 100.0f;
-		remoteCircleToDraw = 1;
-		
+	
+	//
+	// xxxxyyyy <-- 8 caratteri per posizione
+	// n x 8 caratteri quando si tracciano n dita
+	// vedi anche syncronizeStateWithRemote()
+	//
+	protected void setupFirebase() {
 		firebaseme.addValueEventListener(new ValueEventListener() {
-
 		    @Override
 		    public void onDataChange(DataSnapshot snap) {
-		    	String pos[] = new String[2];
-		    	String stringSplit[] = new String[MAXTOUCHES+1];
 		    	String message = String.format("%s",snap.getValue());
-		    	if ( message.length() > 0 && ! message.equals("null") 
-		    			&& ! message.equals("C:0")) {
-		    		Log.i(TAG, String.format(">>>> %s",message));
-		    		stringSplit = message.split("\\|");
-		    		if ( stringSplit.length > 0) {
-			    		remoteCircleToDraw = Integer.parseInt(stringSplit[0].substring(2));// c:<xx
-			    		Log.i(TAG,String.format("got %d circle to draw",remoteCircleToDraw));
-			    		for ( int i = 0; i < stringSplit.length - 1; i++ ) {
-			    			Log.i(TAG, stringSplit[i+1]);
-			    			pos = stringSplit[i+1].split(";");
-			    			rX[i] = Integer.parseInt(pos[0])/10000.0f*displayW;
-			    			rY[i] = Integer.parseInt(pos[1])/10000.0f*displayH;
-			    		}
+		    	Log.i(TAG, message );
+		    	int length = message.length();
+		    	if ( length > 0 ) {
+		    		//Log.i(TAG, String.format(">>>> %s",message));
+		    		remoteCircleToDraw = length / 8;
+		    		//Log.i(TAG,String.format("got %d circle to draw",remoteCircleToDraw));
+		    		int j,i;
+		    		for ( i = j = 0; i < length; i += 8, j++ ) {
+		    			rX[j] = Integer.parseInt( 
+		    				message.substring(i,i+4)
+		    					)/10000.0f*displayW;
+		    			rY[j] = Integer.parseInt( 
+		    				message.substring(i+4,i+8)
+		    					)/10000.0f*displayH;
 		    		}
-		    		Log.i(TAG, message);
+		    	} 
+		    	else { 
+		    		remoteCircleToDraw = 0;
+		    		//force view redraw ( when invalid onDraw is called )
+		    		dv.invalidate();  
 		    	}
 		    }
 
 		    @Override public void onCancelled(FirebaseError error) { }
 		});
-		
+	}
+	
+	private int getRadiusValue( ) {
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize( size );
+		return Math.min(size.x, size.y) / 10;
+	}
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		dv = new DrawingView(this);
+		radius = getRadiusValue();
+		setContentView(dv);
+		setupCirclePaint();
+		setupFirebase();
 	}
 
 	
@@ -105,10 +127,9 @@ public class MainActivity extends Activity {
 		private Path remoteCirclePath;
 		private int circleToDraw = 0;
 		private int oldCircleToDraw = 0;
+		// posizioni correnti
 		private float[] mX = new float[MAXTOUCHES];
 		private float[] mY = new float[MAXTOUCHES];
-		private float[] oX = new float[MAXTOUCHES];
-		private float[] oY = new float[MAXTOUCHES];
 		private static final float TOUCH_TOLERANCE = 4;
 
 		public DrawingView(Context context) {
@@ -140,48 +161,30 @@ public class MainActivity extends Activity {
 			canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 			circlePath.reset();
 			remoteCirclePath.reset();
-			for (int i = 0; i < circleToDraw; i++) {
-				circlePath.addCircle(mX[i], mY[i], 100, Path.Direction.CW);
-			}
-			for (int i = 0; i < remoteCircleToDraw; i++) {
-				remoteCirclePath
-						.addCircle(rX[i], rY[i], 100, Path.Direction.CW);
-			}
+			
+			for (int i = 0; i < circleToDraw; i++)
+				circlePath.addCircle(mX[i], mY[i], radius, Path.Direction.CW);
+			
+			for (int i = 0; i < remoteCircleToDraw; i++)
+				remoteCirclePath.addCircle(rX[i], rY[i], radius, Path.Direction.CW);
+			
 			canvas.drawPath(circlePath, circlePaint);
 			canvas.drawPath(remoteCirclePath, remoteCirclePaint);
 			syncronizeStateWithRemote();
 		}
 
-		// controlla se il numero dei cerchi oppure la loro posizione è variata
-		// e nel caso invia di nuovo al remoto tutto lo stato locale
-		// si potrebbe ottimizzare inviando solo le diffenze
 		private void syncronizeStateWithRemote() {
-			boolean alteredState = false;
-			if (circleToDraw != oldCircleToDraw) {
-				oldCircleToDraw = circleToDraw;
-				alteredState = true;
-			} else {
-				for (int i = 1; i < circleToDraw; i++) {
-					if (mX[i] != oX[i]) {
-						alteredState = true;
-						break;
-					}
-				}
+
+			StringBuffer message = new StringBuffer("");
+			for ( int i = 0 ; i < circleToDraw; i++) {
+				message.append(
+					String.format("%04d%04d", 
+						(int)(mX[i]/displayW*10000), 
+						(int)(mY[i]/displayH*10000) 
+					)
+				);
 			}
-			// here altered state is available and updated
-			if (alteredState) {
-				StringBuffer message = new StringBuffer();
-				message.append(String.format("C:%d", circleToDraw));
-				for ( int i = 0 ; i < circleToDraw; i++) {
-					message.append(
-						String.format("|%04d;%04d", 
-							(int)(mX[i]/displayW*10000), 
-							(int)(mY[i]/displayH*10000) 
-						)
-					);
-				}
-				firebaseme.setValue(message);
-			}
+			firebaseme.setValue(message);
 		}
 
 		private void touch_start(int index, float x, float y) {
@@ -200,7 +203,7 @@ public class MainActivity extends Activity {
 
 		private void touch_up() {
 			circlePath.reset();
-			circleToDraw--;
+			circleToDraw = 0;
 			syncronizeStateWithRemote();
 		}
 
