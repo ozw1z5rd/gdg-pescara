@@ -22,35 +22,60 @@
 
 
 import webapp2
+from urllib2 import quote
 from models import TimespaceCapsule
 from google.appengine.api import users, mail
 from template.AddCapsule import AddCapsuleFormTemplate, AddCapsuleKoTemplate, AddCapsuleOkTemplate
-from template.OpenCapsule import OpenCapsuleTemplate
+from template.OpenCapsule import OpenCapsuleTemplate, OpenCapsuleErrorTemplate
 from template.RegisterCapsule import RegisterCapsuleErrorTemplate, RegisterCapsuleTemplate
+from template.Home import HomeTemplate
 from datetime import datetime
 from decorators import login_required
-from utilities import convert
+from utilities import convert, date2String
 import logging
 
 logging.basicConfig()
 
 class Home(webapp2.RequestHandler):
-    pass
-
-class OpenCapsule(webapp2.RequestHandler):
-    """
-    Gestisce l'apertura di una capsula
-    """
-    @login_required
     def get(self):
-        user = users.get_current_user()
-        tscid = [int(self.request.get('tscid'))]
-        capsule = TimespaceCapsule().get_by_id(tscid)[0]
-        lat   = convert(self.request, 'lat', 'float')
-        lng   = convert(self.request,'lng', 'float')
-        if capsule.requestToOpen( user, lat, lng ) == TimespaceCapsule.TSC_OK:
-            page = OpenCapsuleTemplate({ 'content' : capsule.show() })
-            return self.response.write( page.render())
+        urls= {
+            'add_url' : '/add', \
+            'open_url' : '/open', \
+            'register_url' : '/register'\
+        }
+
+        html = "<ul>"
+        for capsule in TimespaceCapsule.all():
+            id = capsule.key().id()
+            logging.info("capusula. {0}".format(id))
+            openD = date2String(capsule.openingDate)
+            close = date2String(capsule.closingDate)
+            notify = date2String(capsule.notifyDate)
+            seen = "yes" if capsule.seen else "not yet"
+            lastSeenDate = date2String(capsule.lastSeenDate)
+            assigned = "no"
+            if capsule.user is not None:
+                assigned = "yes"
+            if capsule.anonymous:
+                assigned = 'anon'
+            geolocated = "yes" if capsule.positionLat else "no"
+            if not capsule.seen:
+                color = "red"
+            else:
+                color = "black"
+
+            html += """<li><font color='{0}'><b>{1}</b></font>
+                      O:<b>{2}</b> C:<b>{3}</b> notify:<b>{4}</b>
+                      seen:<b>{5}</b> sdate:<b>{6}</b>,
+                      assigned:<b>{7}</b>, geolocated:<b>{8}</b>
+                """.format( color, id, openD, close, notify, seen, \
+                            lastSeenDate, assigned, geolocated)
+
+        html += '</ul>'
+        urls.update({ 'html' : html })
+        page = HomeTemplate( urls )
+        return self.response.write(page.render());
+
 
 class Cron(webapp2.RequestHandler):
     """
@@ -96,23 +121,29 @@ class AddCapsule(webapp2.RequestHandler):
         lat = convert(self.request, 'txtLatitude', 'float')
         lng = convert(self.request, 'txtLongitude', 'float')
         tll = convert(self.request, 'txtTollerance', 'float')
+        reg = convert(self.request, "chkAnonymous", 'boolean')
         try:
             tsc =  TimespaceCapsule( openingDate = openDate,
                 closingDate=closeDate, content=content,
                 positionLat = lat, positionLng = lng,
-                positionTll = tll )
+                positionTll = tll, anonymous=reg )
             tsc.put()
         except Exception as e:
             logging.error(str(e))
             page = AddCapsuleKoTemplate({})
         else:
+            tscid = str(tsc.key().id())
+            link = "{0}/activate?tscid={1}".format(self.request.host_url,tscid)
             page = AddCapsuleOkTemplate({
-                'tscid' : str(tsc.key(),id()),
-                'openingDate' : tsc.openingDate.strftime("%d-%m-%Y"),
-                'closingDate' : tsc.closingDate.strftime("%d-%m-%Y"),
+                'tscid' : tscid,
+                'openingDate' : date2String(tsc.openingDate),
+                'closingDate' : date2String(tsc.closingDate),
                 'content' : tsc.content,
+                'anonymous' :  "yes" if tsc.anonymous else "no",
                 'latitude' : tsc.positionLat or "none",
                 'longitude' : tsc.positionLng or "none",
+                'link' : link,
+                'enc_link' : quote(link),
                 'tollerance' : tsc.positionTll or "none"})
 
         return self.response.write(page.render())
@@ -121,14 +152,64 @@ class AddCapsule(webapp2.RequestHandler):
         page = AddCapsuleFormTemplate({})
         self.response.write(page.render())
 
-class RegisterCapsule(webapp2.RequestHandler):
+
+
+class Activate(webapp2.RequestHandler):
     """
     Registra ( associa ) una capsula ad un utente
+    se non associata e la modalità è anonima tenta l'apertura
+    se associata e l'utente è corretto prova l'apertura
     """
+
+    def _tryOpen(self, user, tscid, capsule ):
+
+        lat   = convert(self.request, 'lat', 'float')
+        lng   = convert(self.request,'lng', 'float')
+
+        message = "This capsule is not bound to any position"
+        if capsule.positionLat is not None:
+            message="This capsule is bound to a position {0},{1}"\
+                .format(capsule.positionLat, capsule.positionLng)
+        responseParameters = { \
+            'openingDate' : date2String(capsule.openingDate), \
+            'closingDate' : date2String(capsule.closingDate),\
+            'space' : message
+        }
+
+        logging.info("prima di fare la richiesta")
+        tscCode = capsule.requestToOpen( user, lat, lng )
+        logging.info("codice di ritorno {0}".format(tscCode))
+
+        if tscCode == TimespaceCapsule.TSC_OK:
+            page = OpenCapsuleTemplate({ 'content' : capsule.show() })
+            return self.response.write( page.render())
+        else:
+            if tscCode == TimespaceCapsule.TSC_TOOSOON:
+                message = "Too soon! opening date is {0}"\
+                    .format( capsule.openingDate.strftime("%d/%m/%Y"))
+            elif tscCode == TimespaceCapsule.TSC_TOOLATE:
+                message = "Too late! Capsule expired on {0}"\
+                    .format(capsule.closingDate.strftime("%d/%m/%Y"))
+            elif tscCode == TimespaceCapsule.TSC_BADUSER:
+                message= "Registered to different user"
+            elif tscCode == TimespaceCapsule.TSC_NOTASSIGNED:
+                message="not yet assigned"
+            elif tscCode == TimespaceCapsule.TSC_TOODISTANT:
+                message = "You are far away from the opening point {0},{1}"\
+                    .format( capsule.positionLat, capsule.positionLng )
+            elif tscCode == TimespaceCapsule.TSC_LATLNG:
+                message = "to open this capsule you have to provide a position"
+
+        responseParameters.update( { 'message' : message })
+        page = OpenCapsuleErrorTemplate( responseParameters )
+
+        self.response.write( page.render() )
+
     @login_required
     def get(self):
         tscid = [int(self.request.get('tscid'))]
         user = users.get_current_user()
+
         try:
             capsule = TimespaceCapsule.get_by_id(tscid)[0]
             logging.info(capsule)
@@ -136,19 +217,25 @@ class RegisterCapsule(webapp2.RequestHandler):
             logging.error(str(e))
             capsule = None
 
-        if capsule is None or capsule.user is not None:
+        if capsule is None:
             message = 'Capsule not found'
-            if capsule is not None:
-                message += ' becayse is already assigned, sorry'
             page = RegisterCapsuleErrorTemplate({'message': message })
-        else:
+
+        if capsule.anonymous:
+            return self._tryOpen(user, tscid, capsule )
+
+        if capsule.user is None:
             capsule.user = user
             capsule.notifyDate = datetime.now()
             capsule.put()
             self.notifyUser(capsule)
             logoutUrl = users.create_logout_url("/register" )
             page = RegisterCapsuleTemplate({ 'logout' : logoutUrl })
-
+        elif capsule.user != user:
+            message = 'capsule is already assigned, sorry'
+            page = RegisterCapsuleErrorTemplate({'message': message })
+        else:
+            return self._tryOpen(user,tscid, capsule )
         self.response.write( page.render() )
 
     def notifyUser(self, capsule ):
@@ -161,8 +248,7 @@ class RegisterCapsule(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', Home),
-    ('/register', RegisterCapsule ),
-    ('/add', AddCapsule ),
-    ('/open', OpenCapsule ),
-    ('/cron', Cron )
+    ('/activate', Activate ), # gestisce il ciclo della capsula
+    ('/add', AddCapsule ), # aggiunge una capsula
+    ('/cron', Cron ) # invia capsule ad utenti registrati
 ], debug=True )

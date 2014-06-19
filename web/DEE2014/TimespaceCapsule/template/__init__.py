@@ -21,6 +21,7 @@
 # Very basic template system
 #
 import logging
+logging.basicConfig()
 
 class TemplateBase( object ):
 
@@ -70,7 +71,8 @@ class TemplateBase( object ):
         data = self.html()
         for key in self._dictionary.keys():
             value = self._dictionary[key]
-            data = data.replace( "{{"+key+"}}", value)
+            logging.info("key:{0} value:{1}".format(key, value))
+            data = data.replace( "{{"+key+"}}", str(value))
         return data
 
     def render(self):

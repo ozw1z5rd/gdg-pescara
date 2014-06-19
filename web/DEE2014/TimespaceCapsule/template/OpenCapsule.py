@@ -24,3 +24,15 @@ class OpenCapsuleTemplate(TemplateBase):
         return """
             Content: <a href="{{content}}">{{content}}</a>
         """
+
+class OpenCapsuleErrorTemplate(TemplateBase):
+    def html(self):
+        return """
+            Can't open the capsule, {{message}}
+            <hr>
+            <ul>
+              <li>Open not before: {{openingDate}}
+              <li>and not after: {{closingDate}}
+              <li>{{space}}
+            </ul>
+        """

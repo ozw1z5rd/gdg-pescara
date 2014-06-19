@@ -30,6 +30,7 @@ class AddCapsuleFormTemplate(TemplateBase):
               <li>latitude:<input type="text" name="txtLatitude"></input>
               <li>longitude:<input type=text" name="txtLongitude"></input>
               <li>Tollerance:<input type="text" name="txtTollerance"></input>
+              <li>Anonymous:<input type="checkbox" name="chkAnonymous"></input>
               <input type="submit">
           </form>
         """
@@ -46,7 +47,10 @@ class AddCapsuleOkTemplate(TemplateBase):
             <li>latitude: {{latitude}}
             <li>longitude: {{longitude}}
             <li>tollerance(m): {{tollerance}}
+            <li>Allow Anonymous: {{anonymous}}
             </ul>
+            <p>link: <a href="{{link}}">{{link}}</a>
+            <p><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{enc_link}}">
         """
 
 class AddCapsuleKoTemplate(TemplateBase):

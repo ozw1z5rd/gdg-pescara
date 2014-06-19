@@ -34,6 +34,8 @@ class TimespaceCapsule(db.Model):
     TSC_TOOSOON = -2
     TSC_TOODISTANT = -3
     TSC_BADUSER  = -4
+    TSC_NOTASSIGNED = -5
+    TSC_LATLNG = -6
     TSC_OK = 1
 
     user        = db.UserProperty()       # owner
@@ -41,10 +43,11 @@ class TimespaceCapsule(db.Model):
     openingDate = db.DateTimeProperty()   #don't open before
     closingDate = db.DateTimeProperty()   #don't read after
     notifyDate  = db.DateTimeProperty()   #usually the same as openingDate
+    anonymous   = db.BooleanProperty()    #allow anonymous to open it
 
     content     = db.TextProperty()       #payload
     seen         = db.BooleanProperty()   #seen
-    LastSeenDate = db.DateTimeProperty()  #if seen
+    lastSeenDate = db.DateTimeProperty()  #if seen
 
     positionLat = db.FloatProperty()      #open at location
     positionLng = db.FloatProperty()
@@ -63,29 +66,40 @@ class TimespaceCapsule(db.Model):
         Torna il contenuto e setta la capsula come vista
         """
         self.seen = True
-        self.LastSeenDate = datetime.now()
+        self.lastSeenDate = datetime.now()
         self.put()
         return self.content
 
     def requestToOpen(self, user, lat, lng ):
         """
         Torna OK se tutti i parametri sono validi
+        se non c'è un utente al momento dell'apertura può essere aperta
+        da chiunque
         """
         now = datetime.now()
-        if user != self.user:
-            return self.TSC_BADUSER
+
+        if not self.anonymous:
+            if user != self.user and self.user is not None:
+                return self.TSC_BADUSER
         if self.openingDate > now:
             return self.TSC_TOOSOON
         if self.closingDate is not None:
             if self.closingDate < now:
                 return self.TSC_TOOLATE
         if self.positionLat is not None and self.positionLng is not None:
+            if lat is None or lng is None:
+                return self.TSC_LATLNG
             if self._distVincenty( lat, lng ) > self.positionTll:
                 return self.TSC_TOODISTANT
 
         return self.TSC_OK
 
     def _distVincenty(self, lat1, lon1) :
+        """
+        Distanza tra due punti sul nostro deforme mondo, il valore
+        tornato è in metri, le due posizioni devono essere passate in
+        gradi
+        """
         lat2 = self.positionLat
         lon2 = self.positionLng
         a = 6378137

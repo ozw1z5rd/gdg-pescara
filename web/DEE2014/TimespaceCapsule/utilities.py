@@ -30,10 +30,23 @@ def convert(request, key, t):
         return None
     if t == 'str':
         return str(value)
+    elif t == 'boolean':
+        if str(value)=="on": # checkbox
+            return True
+        if int(value) > 0: # numbers
+            return True
+        return False
     elif t == 'float':
         return float(value)
     elif t == 'date':
-        return datetime.strptime(value, TIMEFORMAT )
-    return None
+        if value is not None:
+            return datetime.strptime(value, TIMEFORMAT )
+        else: return None
 
-    return request.get(key)
+    return value
+
+
+def date2String( date ):
+    if date is None:
+        return "n.a."
+    return date.strftime("%d-%m-%Y")
