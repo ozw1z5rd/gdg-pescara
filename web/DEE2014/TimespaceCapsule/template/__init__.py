@@ -64,11 +64,10 @@ class TemplateBase( object ):
         """
         return "</body></html>"
 
-    def _computePage(self):
+    def _computePage(self, data):
         """
         does the really hard rendering.
         """
-        data = self.html()
         for key in self._dictionary.keys():
             value = self._dictionary[key]
             logging.info("key:{0} value:{1}".format(key, value))
@@ -82,9 +81,9 @@ class TemplateBase( object ):
         logging.info("Entering render")
         if self._cacheValid:
             return self._cache
-        self._cache += self.head()
+        self._cache += self._computePage( self.head() )
         self._cache += self.openBody()
-        self._cache += self._computePage()
+        self._cache += self._computePage( self.html() )
         self._cache += self.closeBody()
         return self._cache
 

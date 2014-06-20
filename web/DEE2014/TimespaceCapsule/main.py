@@ -29,6 +29,7 @@ from template.AddCapsule import AddCapsuleFormTemplate, AddCapsuleKoTemplate, Ad
 from template.OpenCapsule import OpenCapsuleTemplate, OpenCapsuleErrorTemplate
 from template.RegisterCapsule import RegisterCapsuleErrorTemplate, RegisterCapsuleTemplate
 from template.Home import HomeTemplate
+from template.Geolocation import GeolocationTemplate
 from datetime import datetime
 from decorators import login_required
 from utilities import convert, date2String
@@ -153,7 +154,6 @@ class AddCapsule(webapp2.RequestHandler):
         self.response.write(page.render())
 
 
-
 class Activate(webapp2.RequestHandler):
     """
     Registra ( associa ) una capsula ad un utente
@@ -170,10 +170,13 @@ class Activate(webapp2.RequestHandler):
         if capsule.positionLat is not None:
             message="This capsule is bound to a position {0},{1}"\
                 .format(capsule.positionLat, capsule.positionLng)
+
         responseParameters = { \
             'openingDate' : date2String(capsule.openingDate), \
             'closingDate' : date2String(capsule.closingDate),\
-            'space' : message
+            'space' : message,
+            'tscid' : tscid[0],
+            'host' : self.request.host_url,
         }
 
         logging.info("prima di fare la richiesta")
@@ -246,7 +249,40 @@ class Activate(webapp2.RequestHandler):
             body="""you will be notified about capsule opening"""
             )
 
+class Radar(webapp2.RequestHandler):
+    """
+    returns how far is this capsule
+    """
+    def get(self):
+        tscid = [int(self.request.get('tscid'))]
+        lat   = convert(self.request, 'lat', 'float')
+        lng   = convert(self.request,'lng', 'float')
+        if lng is None or lat is None:
+            rc = "-2|"
+        try:
+            obj = TimespaceCapsule.get_by_id(tscid)[0]
+        except Exception as e:
+            logging.warn(str(e))
+            obj = None
+        if obj is None:
+            rc = '-1|'
+        else:
+            distance = obj.distance(lat,lng)
+            if distance < 1000:
+                strDistance = str(distance) + " meters"
+            else:
+                strDistance = str(distance/1000.0) + " Km"
+            rc = "0|"+str(strDistance)
+        return self.response.write(rc)
+
+class Test(webapp2.RequestHandler):
+    def get(self):
+        page = GeolocationTemplate({})
+        return self.response.write( page.render() )
+
 app = webapp2.WSGIApplication([
+    ('/test', Test),
+    ('/radar', Radar),
     ('/', Home),
     ('/activate', Activate ), # gestisce il ciclo della capsula
     ('/add', AddCapsule ), # aggiunge una capsula

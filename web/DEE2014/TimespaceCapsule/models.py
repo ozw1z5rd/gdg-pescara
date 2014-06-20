@@ -70,6 +70,9 @@ class TimespaceCapsule(db.Model):
         self.put()
         return self.content
 
+    def distance(self, lat, lng):
+        return self._distVincenty(lat, lng)
+
     def requestToOpen(self, user, lat, lng ):
         """
         Torna OK se tutti i parametri sono validi
