@@ -85,7 +85,7 @@ class Cron(webapp2.RequestHandler):
     """
     def _sendMail(self, capsule):
 
-        body="You Got A Message From Past click to open"
+        body="You Got A Message From Past click to open  "
         if capsule.positionLat is not None and capsule.positionLng is not None:
             body += "http://timespacecapsule.appspot.com/activate?tscid={1}&lat=0&lan=0"\
                 .format( self.request.host_url, str(capsule.key().id()))
