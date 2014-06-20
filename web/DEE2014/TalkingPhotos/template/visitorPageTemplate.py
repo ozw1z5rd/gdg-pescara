@@ -32,22 +32,23 @@ class VisitorPageTemplate( TemplateBase ):
 class VisitorWaitTemplate( TemplateBase ):
     def html( self ):
         return """
-            Richiesta di autorizzazione inviata. Riceverai una email non
+            <p class="bg-success">Richiesta di autorizzazione inviata. Riceverai una email non
             appena possibile.
-            <br><a href="{{logout}}">logout</a>
+            <br><a href="{{logout}}">logout</a></p>
         """
 
 class VisitorActivatedTemplate(TemplateBase):
     def html(self):
         return """
-            Utente {{email}} attivato, ora puo' accedere alla risorsa
-        """
+            <p class="bg-success">Utente {{email}} attivato, ora puo' accedere alla risorsa</p>
+           <br>Clicca qui per fare il <a href="{{logout}}">logout</a>
+	"""
 
 class VisitorActivatedErrorTemplate(TemplateBase):
     def html(self):
         return """
-            Impossibile attivare: {{email}}, forse email errata oppure
-            utente di amministrazione errata.
+            <p class="bg-danger">Impossibile attivare: {{email}}, forse email errata oppure
+            utente di amministrazione errata.</p>
         """
 
 
@@ -55,5 +56,5 @@ class VisitorActivatedErrorTemplate(TemplateBase):
 class VisitorActivatedDebugTemplate(TemplateBase):
     def html(self):
         return """
-            Clicca per attivare: <a href="/authorize?email={{email}}">/authorize?email={{email}}</a>
+            <p class="bg-success">Clicca per attivare: <a href="/authorize?email={{email}}">/authorize?email={{email}}</a></p>
         """

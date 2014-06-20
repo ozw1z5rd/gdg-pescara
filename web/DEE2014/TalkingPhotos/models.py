@@ -19,6 +19,10 @@
 
 from google.appengine.ext import db
 
+# utente, stato, risorsa id e risorsa
+
 class AllowedUser (db.Model):
+    idResource = db.StringProperty()
     email = db.EmailProperty()
     status = db.IntegerProperty() # 0 : no, 1: si, -1 : pending
+
