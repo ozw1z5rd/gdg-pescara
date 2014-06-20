@@ -45,10 +45,33 @@ class TemplateBase( object ):
         return the page header section and starts the html
         """
         return """
-            <!DOCTYPE HTML>
-            <html>
-            <head>
-                <title>TemplateBase head</title>
+			<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				<meta charset="utf-8">
+				<meta http-equiv="X-UA-Compatible" content="IE=edge">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<meta name="description" content="">
+
+                <title>Timespace Capsule</title>
+
+				<!-- Bootstrap core CSS -->
+				<link href="css/bootstrap.css" rel="stylesheet">
+
+				<!-- Custom styles for this template -->
+				<link href="css/style.css" rel="stylesheet">
+
+				<!-- Google web Font -->
+				<link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900,100'  rel='stylesheet' type='text/css'>
+
+				<!-- Just for debugging purposes. Don't actually copy this line! -->
+				<!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+				<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+				<!--[if lt IE 9]>
+					  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+					  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+				<![endif]-->
             </head>
         """
 
@@ -56,18 +79,26 @@ class TemplateBase( object ):
         """
         opens the page body
         """
-        return "<body>"
+        return """
+			<body>
+				<header>
+					<p><a href="http://www.gdg-pescara.org" title="Google Developer Group Pescara Official Site"><img src="img/gdg-pescara.png" class="img-responsive"></a></p>
+					<h1><strong>DEE 2014</strong> // Timescape Capsule</h1>
+				</header>
+				<div class="container">
+		"""
 
     def closeBody(self):
         """
         closes the page body and page too...
         """
-        return "</body></html>"
+        return "</div></body></html>"
 
     def _computePage(self, data):
         """
         does the really hard rendering.
         """
+
         for key in self._dictionary.keys():
             value = self._dictionary[key]
             logging.info("key:{0} value:{1}".format(key, value))

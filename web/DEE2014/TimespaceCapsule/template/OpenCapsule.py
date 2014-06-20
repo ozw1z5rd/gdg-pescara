@@ -22,15 +22,39 @@ from template import TemplateBase
 class OpenCapsuleTemplate(TemplateBase):
     def html(self):
         return """
-            Content: <a href="{{content}}">{{content}}</a>
+            <p>Content: <a href="{{content}}">{{content}}</a></p>
         """
 
 class OpenCapsuleErrorTemplate(TemplateBase):
     def head(self):
+        # make me better
         return """
             <!DOCTYPE HTML>
             <html>
             <head>
+                <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="description" content="">
+
+                <!-- Bootstrap core CSS -->
+                <link href="css/bootstrap.css" rel="stylesheet">
+
+                <!-- Custom styles for this template -->
+                <link href="css/style.css" rel="stylesheet">
+
+                <!-- Google web Font -->
+                <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900,100'  rel='stylesheet' type='text/css'>
+
+                <!-- Just for debugging purposes. Don't actually copy this line! -->
+                <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+                <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!--[if lt IE 9]>
+                      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+                      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+                <![endif]-->
+
                 <title>Timespace Capsule</title>
                     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
@@ -40,7 +64,7 @@ class OpenCapsuleErrorTemplate(TemplateBase):
                         var distance = null;
                         var curr_lat;
                         var curr_lng;
-                        var host = "{{host}}"
+                        var host = "{{host}}";
 
                         inCasoDiSuccesso = function(position){
 
@@ -73,8 +97,8 @@ class OpenCapsuleErrorTemplate(TemplateBase):
     def html(self):
         return """
         <form id="formActivate" action="{{host}}/activate" method="GET">
-            Can't open the capsule, {{message}}
-            <hr>
+        <p class="bg-danger">Can't open the capsule, {{message}}</p>
+        <hr>
             <ul>
               <li>Open not before: {{openingDate}}
               <li>and not after: {{closingDate}}
@@ -99,14 +123,6 @@ class OpenCapsuleErrorTemplate(TemplateBase):
 
 
 class OpenCapsuleErrorTemplateNoGeo(TemplateBase):
-    def head(self):
-        return """
-            <!DOCTYPE HTML>
-            <html>
-            <head>
-                <title>Timespace Capsule</title>
-            </head>
-        """
 
 
     def html(self):

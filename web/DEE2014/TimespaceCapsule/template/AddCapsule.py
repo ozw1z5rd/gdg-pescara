@@ -22,8 +22,9 @@ from template import TemplateBase
 class AddCapsuleFormTemplate(TemplateBase):
     def html(self):
         return """
+			<h3>Add a new TSC</h3>
           <form action="/add" method="POST">
-          <ul>
+			<!-- <ul>
               <li>Opening Date:<input type="text" name="txtOpenDate"></input>
               <li>Closing Date:<input type="text" name="txtCloseDate"></input>
               <li>Content:<input type="text" name="txtContent"></input>
@@ -32,13 +33,46 @@ class AddCapsuleFormTemplate(TemplateBase):
               <li>Tollerance:<input type="text" name="txtTollerance"></input>
               <li>Anonymous:<input type="checkbox" name="chkAnonymous"></input>
               <input type="submit">
-          </form>
+            -->
+		  
+
+		  <div class="form-group">
+				<label for="exampleInputEmail1">Opening Date:</label>
+				<input type="text" class="form-control" name="txtOpenDate" placeholder="gg/mm/aaaa">
+		  </div>
+		  <div class="form-group">
+				<label for="exampleInputPassword1">Closing Date:</label>
+				<input type="text" class="form-control" name="txtCloseDate" placeholder="gg/mm/aaaa">
+		  </div>
+		  <div class="form-group">
+				<label for="exampleInputFile">Content:</label>
+				<input type="text" class="form-control" name="txtContent" placeholder="content">
+		  </div>
+		  <div class="form-group">
+				<label for="exampleInputFile">Latitude:</label>
+				<input type="text" class="form-control" name="txtLatitude" placeholder="gps">
+		  </div>
+		  <div class="form-group">
+				<label for="exampleInputFile">Longitude:</label>
+				<input type="text" class="form-control" name="txtLongitude" placeholder="gps">
+		  </div>
+		  <div class="form-group">
+				<label for="exampleInputFile">Tollerance:</label>
+				<input type="text" class="form-control" name="txtTollerance" placeholder="tollerance">
+		  </div>
+		  <div class="checkbox">
+			<label>
+			  <input type="checkbox" name="chkAnonymous"> Anonymous
+			</label>
+		  </div>
+		  <input type="submit">
+		</form>
         """
 
 class AddCapsuleOkTemplate(TemplateBase):
     def html(self):
         return """
-            <h3>Capsule created</h3>
+            <h3 class="bg-success">Capsule created</h3>
             <br>Capsule id:<b>{{tscid}}</b>
             <ul>
             <li>opening date:{{openingDate}}
@@ -56,5 +90,5 @@ class AddCapsuleOkTemplate(TemplateBase):
 class AddCapsuleKoTemplate(TemplateBase):
     def html(self):
         return """
-            <h3>Capsule Not created</h3>
+            <h3 class="bg-danger">Capsule Not created</h3>
         """
