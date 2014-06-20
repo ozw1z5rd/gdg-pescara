@@ -26,7 +26,8 @@ from urllib2 import quote
 from models import TimespaceCapsule
 from google.appengine.api import users, mail
 from template.AddCapsule import AddCapsuleFormTemplate, AddCapsuleKoTemplate, AddCapsuleOkTemplate
-from template.OpenCapsule import OpenCapsuleTemplate, OpenCapsuleErrorTemplate
+from template.OpenCapsule import OpenCapsuleTemplate, OpenCapsuleErrorTemplate,\
+    OpenCapsuleErrorTemplateNoGeo
 from template.RegisterCapsule import RegisterCapsuleErrorTemplate, RegisterCapsuleTemplate
 from template.Home import HomeTemplate
 from template.Geolocation import GeolocationTemplate
@@ -134,7 +135,7 @@ class AddCapsule(webapp2.RequestHandler):
             page = AddCapsuleKoTemplate({})
         else:
             tscid = str(tsc.key().id())
-            link = "{0}/activate?tscid={1}".format(self.request.host_url,tscid)
+            link = "{0}/activate?tscid={1}&lat=0&lng=0".format(self.request.host_url,tscid)
             page = AddCapsuleOkTemplate({
                 'tscid' : tscid,
                 'openingDate' : date2String(tsc.openingDate),
@@ -166,6 +167,9 @@ class Activate(webapp2.RequestHandler):
         lat   = convert(self.request, 'lat', 'float')
         lng   = convert(self.request,'lng', 'float')
 
+        logging.info(lat)
+        logging.info(lng)
+
         message = "This capsule is not bound to any position"
         if capsule.positionLat is not None:
             message="This capsule is bound to a position {0},{1}"\
@@ -179,9 +183,7 @@ class Activate(webapp2.RequestHandler):
             'host' : self.request.host_url,
         }
 
-        logging.info("prima di fare la richiesta")
         tscCode = capsule.requestToOpen( user, lat, lng )
-        logging.info("codice di ritorno {0}".format(tscCode))
 
         if tscCode == TimespaceCapsule.TSC_OK:
             page = OpenCapsuleTemplate({ 'content' : capsule.show() })
@@ -204,7 +206,10 @@ class Activate(webapp2.RequestHandler):
                 message = "to open this capsule you have to provide a position"
 
         responseParameters.update( { 'message' : message })
-        page = OpenCapsuleErrorTemplate( responseParameters )
+        if capsule.positionLat is None or capsule.positionLng is None:
+            page = OpenCapsuleErrorTemplateNoGeo(responseParameters)
+        else:
+            page = OpenCapsuleErrorTemplate(responseParameters)
 
         self.response.write( page.render() )
 

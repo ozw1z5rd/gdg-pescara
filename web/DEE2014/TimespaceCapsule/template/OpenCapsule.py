@@ -32,8 +32,7 @@ class OpenCapsuleErrorTemplate(TemplateBase):
             <html>
             <head>
                 <title>Timespace Capsule</title>
-
-                    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+                    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
                     <script>
                         var id_watch = null;
@@ -67,7 +66,6 @@ class OpenCapsuleErrorTemplate(TemplateBase):
                         }
 
                     </script>
-                <title>TemplateBase head</title>
             </head>
         """
 
@@ -93,6 +91,36 @@ class OpenCapsuleErrorTemplate(TemplateBase):
             <input type="hidden" id="tscid"name="tscid" value="{{tscid}}">
             <input type="hidden" id="lat" name="lat" value="0">
             <input type="hidden" id="lng" name="lng" value="0">
+            <button id="bntOpen" type="submit" >
+                Try to open
+            </button>
+            </form>
+        """
+
+
+class OpenCapsuleErrorTemplateNoGeo(TemplateBase):
+    def head(self):
+        return """
+            <!DOCTYPE HTML>
+            <html>
+            <head>
+                <title>Timespace Capsule</title>
+            </head>
+        """
+
+
+    def html(self):
+        return """
+        <form id="formActivate" action="{{host}}/activate" method="GET">
+            Can't open the capsule, {{message}}
+            <hr>
+            <ul>
+              <li>Open not before: {{openingDate}}
+              <li>and not after: {{closingDate}}
+              <li>{{space}}
+            </ul>
+
+            <input type="hidden" id="tscid"name="tscid" value="{{tscid}}">
             <button id="bntOpen" type="submit" >
                 Try to open
             </button>
