@@ -234,7 +234,6 @@ class Activate(webapp2.RequestHandler):
 
         if capsule.user is None:
             capsule.user = user
-            capsule.notifyDate = datetime.now()
             capsule.put()
             self.notifyUser(capsule)
             logoutUrl = users.create_logout_url("/" )
