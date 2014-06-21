@@ -47,11 +47,13 @@ class TimespaceCapsule(db.Model):
 
     content     = db.TextProperty()       #payload
     seen         = db.BooleanProperty()   #seen
+    notified     = db.BooleanProperty(default=False)
     lastSeenDate = db.DateTimeProperty()  #if seen
 
     positionLat = db.FloatProperty()      #open at location
     positionLng = db.FloatProperty()
     positionTll = db.FloatProperty()
+
 
     def assignToUser(self, user):
         self.user = user

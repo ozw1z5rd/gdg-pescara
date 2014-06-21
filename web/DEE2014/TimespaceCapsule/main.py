@@ -103,8 +103,9 @@ class Cron(webapp2.RequestHandler):
         for capsule in allCapsule:
             if capsule.openingDate < datetime.now():
                 if capsule.closingDate > datetime.now():
-                    if capsule.user is not None:
-                        self._sendMail( capsule )
+                    if capsule.notifyDate is None:
+                        if capsule.user is not None:
+                            self._sendMail( capsule )
         return self.response.write("")
 
 
