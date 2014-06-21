@@ -43,7 +43,7 @@ class Home(webapp2.RequestHandler):
         urls= {
             'add_url' : '/add', \
             'open_url' : '/open', \
-            'register_url' : '/register'\
+            'register_url' : '/'\
         }
 
         html = "<ul>"
@@ -237,7 +237,7 @@ class Activate(webapp2.RequestHandler):
             capsule.notifyDate = datetime.now()
             capsule.put()
             self.notifyUser(capsule)
-            logoutUrl = users.create_logout_url("/register" )
+            logoutUrl = users.create_logout_url("/" )
             page = RegisterCapsuleTemplate({ 'logout' : logoutUrl })
         elif capsule.user != user:
             message = 'capsule is already assigned, sorry'
