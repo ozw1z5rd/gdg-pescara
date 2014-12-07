@@ -18,7 +18,7 @@
 #     https://sites.google.com/site/ozw1z5rd/
 
 application: timespacecapsule
-version: 1
+version: 2
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -40,9 +40,18 @@ handlers:
 - url: /js
   static_dir: js
 
-- url: .*
+# Endpoints handler
+- url: /_ah/spi/.*
+  script: endpoint.APPLICATION
+- url: /.*
   script: main.app
 
 libraries:
 - name: webapp2
   version: "2.5.2"
+- name: endpoints
+  version: 1.0
+- name: pycrypto
+  version: latest
+
+

@@ -1,3 +1,4 @@
+# -*- coding: latin-1 -*-
 #     This file is part of Timespace Capsule.
 #
 #     Timespace Capsule is free software: you can redistribute it and/or modify
@@ -17,15 +18,32 @@
 #     fb.com/alessio.palma
 #     https://sites.google.com/site/ozw1z5rd/
 
-
 #
 # Utilities, things which does not fit elsewhere
 #
 from datetime import datetime
-TIMEFORMAT = "%d/%m/%Y" # 31/01/2010
+from config import TIMEFORMAT, CONVERSION_MAP, MAIL_SENDER
+from google.appengine.api import mail
 
-def convert(request, key, t):
+
+def sendEmail( to, subject, body ):
+    """Sends email to "to" using body "body
+    """
+    return mail.send_mail( sender=MAIL_SENDER, to=to, subject=subject, body=body )
+    
+
+def convert(request, key):
+    """
+    IN -> request, parametername 
+    OUT : request paraman converted to pythonish type
+          if parametername is not into request/conversion failed 
+          -> return None
+          
+    P.S: date -> datetime 
+    """
+    t = CONVERSION_MAP[key]
     value = request.get(key)
+    # TODO non controlla se ci sono chiavi con valore multipli
     if value is None or len(value) == 0:
         return None
     if t == 'str':
@@ -40,13 +58,44 @@ def convert(request, key, t):
         return float(value)
     elif t == 'date':
         if value is not None:
-            return datetime.strptime(value, TIMEFORMAT )
+            return datetime.strptime(value, TIMEFORMAT)
         else: return None
-
     return value
 
+
+def validateParams( request, paramList ):
+    """
+    verifica che la lista dei parametri sia disponibile nella richiesta che 
+    è pervenuta al sistema
+    
+    in : una lista di parametri ed un request
+    out : true : ci sono tutti, 
+          flase, ne manca almeno uno
+    """
+    for param in paramList:
+        value = request.get(param)
+        if value is None or len(str(value)) == 0:
+            return False
+    return True
+    
+    
 
 def date2String( date ):
     if date is None:
         return "n.a."
-    return date.strftime("%d-%m-%Y")
+    return date.strftime(TIMEFORMAT)
+
+
+def parseRequest(request):
+    command = "TODO"
+    args = dict();
+    for param in request.arguments():
+        if CONVERSION_MAP.has_key(param):
+            args['param'] = convert(request, param, CONVERSION_MAP[param])
+    return command, args
+
+
+
+
+
+
