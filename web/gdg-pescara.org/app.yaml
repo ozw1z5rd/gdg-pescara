@@ -1,0 +1,57 @@
+#     This file is part of Timespace Capsule.
+#
+#     Timespace Capsule is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     Timespace Capsule is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with Timespace Capsule.  If not, see <http://www.gnu.org/licenses/>.
+#
+#     Alessio Palma / 2014
+#     fb.com/alessio.palma
+#     https://sites.google.com/site/ozw1z5rd/
+
+application: gdgpescaraorg  
+version: 2
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /css
+  static_dir: css
+
+- url: /img
+  static_dir: img
+
+- url: /fonts
+  static_dir: fonts
+
+- url: /js
+  static_dir: js
+
+# Endpoints handler
+- url: /_ah/spi/.*
+  script: endpoint.APPLICATION
+- url: /.*
+  script: main.app
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+- name: endpoints
+  version: 1.0
+- name: pycrypto
+  version: latest
+
+
