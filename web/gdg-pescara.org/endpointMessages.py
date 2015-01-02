@@ -1,9 +1,21 @@
 # -*- coding: latin-1 -*-
 from protorpc import messages, message_types
 
+class GDGPEEmptyRequest(messages.Message):
+	pass
+
 class GDGPETagSingle(messages.Message):
 	tag = messages.StringField(1)
 
+class GDGPEImageSingle(messages.Message):
+	data = messages.BytesField(1,required=True)
+
+class GDGPELinkSingle(messages.Message):
+	url = messages.StringField(1,required=True)
+	
+class GDGPEStringSingle(messages.Message):
+	value = messages.StringField(1,required=True)
+	
 # ----
 #
 # REQUEST ---------------- Parametri da passare nelle chiamate
@@ -51,6 +63,19 @@ class GDGPEQuestionAnswerReplyRequest(messages.Message):
 	body = messages.StringField(2,required=True)
 	dateNow = message_types.DateTimeField(3,required=False)
 
+class GDGPECreatePostRequest(messages.Message):
+	"""Creazione di un nuovo post"""
+	title = messages.StringField(1,required=True)
+	tags = messages.MessageField(GDGPETagSingle,2,repeated=True)
+	sector = messages.StringField(3,required=True)
+	date = message_types.DateTimeField(4,required=True)
+	image = messages.MessageField(GDGPEImageSingle,5,repeated=True)
+	body = messages.StringField(6,required=True)
+	authors = messages.MessageField( GDGPEStringSingle,7,repeated=True)
+	repositoryLink = messages.MessageField( GDGPELinkSingle,8,repeated=True)
+	reference = messages.MessageField( GDGPELinkSingle,9,repeated=True)
+	
+	messages.BytesField
 # ----
 #
 # RESPONSES -------------- Quello che l'endpoint torna al chiamante
