@@ -5,7 +5,10 @@ from endpointMessages import GDGPEPostRequest, GDGPEPostResponse,\
 	GDGPEEmptyRequest, GDGPETecnologyListResponse, GDGPEQuizRequest,\
 	GDGPEQuizResponse, GDGPEQuestionCreateRequest, GDGPEAnswerResponse,\
 	GDGPEQuestionAnswerRequest, GDGPEQuestionAnswerReplyRequest,\
-	GDGPEQuizUpdateRequest, GDGPECreatePostRequest
+	GDGPEQuizUpdateRequest, GDGPECreatePostRequest, GDGPESubscribeUserRequest,\
+	GDGPEUnsubscribeUserRequest, GDGPEUserInfoRequest, GDGPEUserInfoResponse,\
+	GDGPEUnsubscribeUserResponse, GDGPESubscribeUserResponse,\
+	GDGPEQuestionAnswerRatingRequest, GDGPEQuestionAnswerRatingResponse
 
 @endpoints.api(name="gdgPescaraOrg", version="v1", description="GDG Pescara endpoints", hostname ="localhost")
 class GDGPEEndpoint(remote.Service):
@@ -59,7 +62,22 @@ class GDGPEEndpoint(remote.Service):
 	def replyAnswer(self,request):
 		return ""
 	
-	
+	# permette di dare una preferenza ad una risposta.
+	@endpoints.method(GDGPEQuestionAnswerRatingRequest,GDGPEQuestionAnswerRatingResponse,name="gdgPE.rateQuestionAnswer",http_method="POST")
+	def rateQuestionAnswer(self,request):
+		return
+	#
+	# User
+	#
+	@endpoints.method(GDGPESubscribeUserRequest, GDGPESubscribeUserResponse, name="gdgPE.userSubscribe",http_method="POST")
+	def subscribeUser(self,request):
+		return ""
+	@endpoints.method(GDGPEUnsubscribeUserRequest, GDGPEUnsubscribeUserResponse, name="gdgPE.userUnsubscribe",http_method="POST")
+	def unsubscribeUser(self,request):
+		return ""
+	@endpoints.method(GDGPEUserInfoRequest, GDGPEUserInfoResponse, name="gdgPE.userInfo", http_method="POST")
+	def userInfo(self,request):
+		return
 	
 # see application.yaml
 APPLICATION=endpoints.api_server([GDGPEEndpoint], restricted=False)

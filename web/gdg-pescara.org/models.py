@@ -1,6 +1,8 @@
 # -*- coding: latin-1 -*-
 #
 # 29/12/2014 -> prima bozza
+# 09/01/2014 -> qualcosa di più corretto e stabile
+#
 from google.appengine.ext import db
 
 class Technology(db.Model):
@@ -101,4 +103,3 @@ class Question(db.Model):
 	sector = db.ListProperty(Sector)
 	# una lista di risposte
 	answer = db.ListProperty(QuestionsAnswer)
-
