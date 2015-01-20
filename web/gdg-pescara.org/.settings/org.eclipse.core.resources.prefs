@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
 encoding/endpoint.py=latin1
 encoding/endpointMessages.py=latin1
+encoding/logger.py=latin1
 encoding/models.py=latin1

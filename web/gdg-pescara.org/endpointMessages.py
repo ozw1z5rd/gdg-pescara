@@ -26,6 +26,7 @@ class GDGPEMetaDataElement(messages.Message):
 	# campi addizionali per debug
 	debug1 = messages.StringField(4, required=False)
 	debug2 = messages.BytesField(5,required=False)
+	
 
 class GDGPESectorElement(messages.Message):
 	title = messages.StringField(1)
@@ -134,6 +135,10 @@ class GDGPEUserInfoRequest(messages.Message):
 	loggato, l'email serve quando viene chiamata dall'utente ammininistratore"""	
 	email = messages.StringField(1,required=False)
 
+class GDGPEChangeUserInfoRequest(messages.Message):
+	"""cambia le impostazioni dell'utente"""
+	allowsMailing = messages.BooleanField(1,required=True)
+
 class GDGPEQuestionAnswerRatingRequest(messages.Message):
 	"""Serve a dare un punteggio ad una risposta assegnata ad una domanda"""
 	id = messages.StringField(1,required=True)
@@ -197,6 +202,7 @@ class GDGPEAnswerResponse(messages.Message):
 class GDGPESubscribeUserResponse(messages.Message):
 	meta = messages.MessageField(GDGPEMetaDataElement,1)
 	id = messages.StringField(2, required=True)
+	allowsMailing = messages.BooleanField(3,required=True)
 
 class GDGPEUnsubscribeUserResponse(messages.Message):
 	"""cancella l'utente attualmente connesso con la richiesta"""
@@ -204,6 +210,11 @@ class GDGPEUnsubscribeUserResponse(messages.Message):
 
 class GDGPEUserInfoResponse(messages.Message):
 	meta = messages.MessageField(GDGPEMetaDataElement,1)
+	
+class GDGPEChangeUserInfoResponse(messages.Message):
+	"""cambia le impostazioni dell'utente"""
+	meta = messages.MessageField(GDGPEMetaDataElement,1)
+	allowsMailing = messages.BooleanField(2,required=False)
 
 # rating 
 

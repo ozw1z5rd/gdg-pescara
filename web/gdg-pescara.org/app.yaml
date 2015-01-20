@@ -18,7 +18,7 @@
 #     https://sites.google.com/site/ozw1z5rd/
 
 application: gdgpescaraorg  
-version: 2
+version: 1
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -43,6 +43,7 @@ handlers:
 # Endpoints handler
 - url: /_ah/spi/.*
   script: endpoint.APPLICATION
+# standard
 - url: /.*
   script: main.app
 

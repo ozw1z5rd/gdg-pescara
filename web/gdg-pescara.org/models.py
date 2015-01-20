@@ -3,12 +3,37 @@
 # 29/12/2014 -> prima bozza
 # 09/01/2014 -> qualcosa di più corretto e stabile
 #
+# Ogni oggetto puo' renderizzarsi in un MessageElement ( endpointMessages )
+# e qualcuno può essere creato da un messaggio di endpoints
+# la conversione a MessageElement deve essere fatta in modo puntuale
+#
+#
+# Metodi comuni a tutti gli oggetti del model.
+#
+# newFromRequest -> un nuovo oggetto da una richiesta
+# asMessageElement -> fa il cast ad MessageElement ( serve per l'impacchettamento )
+# getById -> recupera l'elemento per Id 
+# getAll -> torna tutti gli elementi 
+
 from google.appengine.ext import db
+from endpointMessages import GDGPETechnologyElement
+from utility import blobToImageUrl
 
 class Technology(db.Model):
 	"""Descrive una delle possibiliti tecnologie trattate"""
 	description = db.TextProperty()
 	icon = db.BlobProperty()
+
+	def getAll(self):
+		"""torna tutti gli elementi"""
+		self.all()
+
+	def asMessageElement(self):
+		return GDGPETechnologyElement( 
+			id = self.id,
+			description = self.description, 
+			iconLink = blobToImageUrl(self.icon) 
+	)
 
 class UserTechnology(db.Model):
 	"""La UserTechnology serve per poter associare un rating ad una determinata
@@ -24,7 +49,9 @@ class User(db.Model):
 	pochissimi, l'autenticazione e' a carico di Google"""
 	user = db.UserProperty()
 	lastLogin = db.DateTimeProperty()
-	technologies = db.ListProperty(UserTechnology)
+	technologies = db.ListProperty(db.Key)# UserTechnology
+	allowsMailing = db.BooleanProperty(default=True)
+	
 	def email(self):
 		return self.user.email()
 	def username(self):	
@@ -47,15 +74,15 @@ class Post(db.Model):
 	macro categorie: context( news ) e technical ( info tecniche )"""
 	title = db.StringProperty()
 	tags = db.ListProperty(str)
-	sector = db.ListProperty(Sector)
+	sector = db.ListProperty(db.Key)#Sector
 	date = db.DateProperty()
-	image = db.ListProperty(Image)
+	image = db.ListProperty(db.Key) # Image
 	body = db.TextProperty()
-	authors = db.ListProperty(User)
-	repositoryLink = db.ListProperty(db.LinkProperty)
-	reference = db.ListProperty(db.LinkProperty)
+	authors = db.ListProperty(db.Key)#User
+	repositoryLink = db.ListProperty(db.Key) # Link !!! 
+	reference = db.ListProperty(db.Key) # LInk !!!
 	
-# periodicamnete possibile visualizzare quiz per tenere i programmatori 
+# periodicamnete possibile visualizzare qiz per tenere i programmatori 
 # "in forma"
 class QuizsAnswer(db.Model):
 	"""Una delle possibili risposte del quiz"""
@@ -72,20 +99,20 @@ class Quiz(db.Model):
 	body = db.TextProperty()
 	dateStart = db.DateProperty()
 	dateEnd = db.DateProperty()
-	answer = db.ListProperty(QuizsAnswer)
+	answer = db.ListProperty(db.Key)# Quizanswer                               
 	# utenti che hanno gia'  risposto al quiz
-	users = db.ListProperty(User)
+	users = db.ListProperty(db.Key)#User
 
 class Refer(db.Model):
 	"""Permette agli utenti di dare referenze ad altri utenti su determinate 
 	tecnologie"""
 	user = db.ReferenceProperty(User)
-	technology = db.ReferenceProperty(Technology)
+	technology = db.ReferenceProperty(Technology,collection_name="rTechnology")
 	stars = db.RatingProperty()
-	who = db.ReferenceProperty(User)
+	who = db.ReferenceProperty(User,collection_name="rUser")
 	description = db.StringProperty()
 	
-class QuestionsAnswer(db.Model):
+class QuestionAnswer(db.Model):
 	"""Risposta ad una risposta da parte di un altro utente, il rating e' una 
 	sorta di "like" alla facebook """
 	body = db.TextProperty()
@@ -100,6 +127,6 @@ class Question(db.Model):
 	whoMadeTheQuestion = db.ReferenceProperty(User)
 	body = db.TextProperty()
 	tags = db.ListProperty(str)
-	sector = db.ListProperty(Sector)
+	sector = db.ListProperty(db.Key) # Sector
 	# una lista di risposte
-	answer = db.ListProperty(QuestionsAnswer)
+	answer = db.ListProperty(db.Key)# QuestionAnswer
