@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 #
-# traduce richieste e risposte per endpoints
+# traduce richieste e risposte in formato per endpoints
 #
 
 import endpoints
@@ -15,16 +15,16 @@ from endpointMessages import GDGPEPostRequest, GDGPEPostResponse,\
 	GDGPEQuestionAnswerRatingRequest, GDGPEQuestionAnswerRatingResponse,\
 	GDGPEMetaDataElement
 
-from Controller import TechnologyController
+from controller import TechnologyController
 from logger import L
 
+class GDGPEEndpointStatus:
+	CODE_OK = 1
+	CODE_REDIRECT = 2
+	CODE_ERROR = -1
 
 @endpoints.api(name="gdgPescaraOrg", version="v1", description="GDG Pescara endpoints") # hostname = "localhost" o piu' in generare il dominio che serve l'app
 class GDGPEEndpoint(remote.Service):
-
-	META_CODE_OK = 1
-	META_CODE_REDIRECT = 2
-	META_CODE_ERROR = -1
 
 	#not endpoint method
 	def getGDGPEMetaElementByCode(self, code, status="", url=None, d1=None, d2=None):
@@ -64,9 +64,10 @@ class GDGPEEndpoint(remote.Service):
 	@endpoints.method(GDGPEEmptyRequest,GDGPETecnologyListResponse,name="gdgPE.tech.getList",http_method="POST")
 	def getTechList(self,request):
 		L.i("Entering in getTechList")
+		technologyController = TechnologyController()
 		return GDGPETecnologyListResponse(
-			meta = self.getGDGPEMetaElementByCode( GDGPEEndpoint.META_CODE_OK_ ),
-			technologies = list([x.asMessageElement for x in TechnologyController.getList()])
+			meta = self.getGDGPEMetaElementByCode( GDGPEEndpointStatus.CODE_OK ),
+			technologies = list([x.asMessageElement() for x in technologyController.getList(request)])
 		)
 	
 	#

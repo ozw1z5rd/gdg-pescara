@@ -1,6 +1,6 @@
 
 
-def blobToImageUrl():
+def blobToImageUrl( dummy ):
 	"""converte l'oggetto in una url e la ritorna"""
 	return "url"
 

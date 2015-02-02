@@ -19,18 +19,24 @@ from google.appengine.ext import db
 from endpointMessages import GDGPETechnologyElement
 from utility import blobToImageUrl
 
+class Link(db.Model):
+	title = db.StringProperty()
+	url = db.URLProperty()
+	clicks = db.IntegerProperty()
+
 class Technology(db.Model):
 	"""Descrive una delle possibiliti tecnologie trattate"""
+	title = db.StringProperty()
 	description = db.TextProperty()
 	icon = db.BlobProperty()
 
 	def getAll(self):
 		"""torna tutti gli elementi"""
-		self.all()
+		return self.all()
 
 	def asMessageElement(self):
 		return GDGPETechnologyElement( 
-			id = self.id,
+			id = str(self.key()),
 			description = self.description, 
 			iconLink = blobToImageUrl(self.icon) 
 	)
@@ -66,8 +72,8 @@ class Image(db.Model):
 class Sector(db.Model):
 	"""Settore di interesse, per esempio web development oppure IoT etc...
 	ogni articolo viene associato ad un settore"""
-	title = db.StringListProperty()
-	description = db.StringListProperty()
+	title = db.StringProperty()
+	description = db.StringProperty()
 
 class Post(db.Model):
 	"""descrive un articolo, essenzialmente un articolo puo' far parte di due
@@ -88,14 +94,13 @@ class QuizsAnswer(db.Model):
 	"""Una delle possibili risposte del quiz"""
 	text = db.StringProperty()
 	isCorrect = db.BooleanProperty()
+	# quanto hanno risposto
 	click = db.IntegerProperty()
-	# quanto ha risposto
-	dateTime = db.DateTimeProperty(auto_now_add=True)
 
 class Quiz(db.Model):
 	"""Definisce un quiz come una domanda, un intervallo di validita' per il quiz
 	stesso ed una lista di risposte ( di cui una o piu' corretta )"""
-	title = db.StringListProperty()
+	title = db.StringProperty()
 	body = db.TextProperty()
 	dateStart = db.DateProperty()
 	dateEnd = db.DateProperty()

@@ -1,6 +1,7 @@
 from models import Technology
 from config import Configuration
 from logger import L
+from endpointMessages import GDGPEMetaDataElement
 
 # 
 # Il controller prende in input endpointMessage e torna endPointMessages
@@ -32,8 +33,9 @@ class TechnologyController(object):
 	
 	def d(self,request):
 		pass
-
+	
 	def getList(self,request):
-		return  list([ x.asMessageElement() for x in Technology.all() ])
+		technology = Technology()
+		return  list( technology.all() )
 
 

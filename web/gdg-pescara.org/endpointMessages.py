@@ -22,7 +22,7 @@ class GDGPEMetaDataElement(messages.Message):
 	errori a livello di logica etc..."""
 	status = messages.StringField(1,required=True)
 	code = messages.IntegerField(2,required=True)
-	redirectUrl = messages.StringField(3,required=True)
+	redirectUrl = messages.StringField(3,required=False)
 	# campi addizionali per debug
 	debug1 = messages.StringField(4, required=False)
 	debug2 = messages.BytesField(5,required=False)
@@ -34,9 +34,10 @@ class GDGPESectorElement(messages.Message):
 	id = messages.StringField(3)
 
 class GDGPETechnologyElement(messages.Message):
-	description = messages.StringField(1)
-	iconLink = messages.StringField(2)
-	id = messages.StringField(3)
+	title = messages.StringField(1)
+	description = messages.StringField(2)
+	iconLink = messages.StringField(3)
+	id = messages.StringField(4)
 
 class GDGPEAuthorElement(messages.Message):
 	nickName = messages.StringField(1)
