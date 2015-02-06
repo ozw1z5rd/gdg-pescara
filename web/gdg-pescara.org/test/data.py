@@ -11,12 +11,12 @@ class TestData(object):
 		},
 		{
 			'title' : 'Url2', 
-			'url': 'www.yahoo.com',
+			'url': 'http://www.yahoo.com',
 			'clicks' : 0
 		},
 		{
 			'title' : 'Ulr3', 
-			'url': 'www.bing.com',
+			'url': 'http://www.bing.com',
 			'clicks' : 0
 		}
 	)
@@ -89,10 +89,20 @@ class TestData(object):
 	
 	listUser = (
 		{
-			'user' : '', 
+			'user' : '',
+			'email' : '', 
 			'lastLogin' : '2012-12-12 00:00:00', 
 			'technologies' : list(),
-			'allowsMailing' : True, 
+			'allowsMailing' : True,
+			'id' : None
+		},
+		{
+			'user' : '', 
+			'email' : '', 
+			'lastLogin' : '2013-12-12 11:11:11',
+			'technologies' : list(),
+			'allowsMailing' : True,
+			'id' : None
 		}
 	)
 	
@@ -110,7 +120,36 @@ class TestData(object):
 		}
 	)
 	
-	listRefer = ()
+	listRefer = (
+		{
+			'user' : '',
+			'technology' : '', 
+			'stars' : 0, 
+			'who' : '',
+			'description' : ''
+		},
+		{
+			'user' : '',
+			'technology' : '', 
+			'stars' : 0, 
+			'who' : '',
+			'description' : ''
+		},
+		{
+			'user' : '',
+			'technology' : '', 
+			'stars' : 0, 
+			'who' : '',
+			'description' : ''
+		},
+		{
+			'user' : '',
+			'technology' : '', 
+			'stars' : 0, 
+			'who' : '',
+			'description' : ''
+		},				
+	)
 	
 	listQuestion = (
 		{

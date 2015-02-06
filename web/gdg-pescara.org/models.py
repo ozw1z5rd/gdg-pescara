@@ -2,6 +2,8 @@
 #
 # 29/12/2014 -> prima bozza
 # 09/01/2014 -> qualcosa di più corretto e stabile
+# 06/02/2015 -> sostituito UserProperty con una StringPropertu in modo da 
+#               tracciare solo l'id univoco dell'utente.
 #
 # Ogni oggetto puo' renderizzarsi in un MessageElement ( endpointMessages )
 # e qualcuno può essere creato da un messaggio di endpoints
@@ -37,6 +39,7 @@ class Technology(db.Model):
 	def asMessageElement(self):
 		return GDGPETechnologyElement( 
 			id = str(self.key()),
+			title = self.title,
 			description = self.description, 
 			iconLink = blobToImageUrl(self.icon) 
 	)
@@ -53,7 +56,9 @@ class UserTechnology(db.Model):
 class User(db.Model):
 	"""Definisce un utente di questo sistema, pochi dati per non dire 
 	pochissimi, l'autenticazione e' a carico di Google"""
-	user = db.UserProperty()
+	# rappresenta l'id dell'utente 
+	# https://cloud.google.com/appengine/docs/python/users/userobjects
+	user_id = db.StringProperty()
 	lastLogin = db.DateTimeProperty()
 	technologies = db.ListProperty(db.Key)# UserTechnology
 	allowsMailing = db.BooleanProperty(default=True)
