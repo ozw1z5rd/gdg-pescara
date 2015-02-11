@@ -20,6 +20,7 @@
 from google.appengine.ext import db
 from endpointMessages import GDGPETechnologyElement
 from utility import blobToImageUrl
+from config import DEBUG_MODE
 
 class Link(db.Model):
 	title = db.StringProperty()
@@ -63,15 +64,25 @@ class User(db.Model):
 	technologies = db.ListProperty(db.Key)# UserTechnology
 	allowsMailing = db.BooleanProperty(default=True)
 	
+	# debug purposes
+	__email = db.StringProperty()
+	__user = db.StringProperty()
+	
 	def email(self):
+		if DEBUG_MODE:
+			return self.__email 
 		return self.user.email()
 	def username(self):	
+		if DEBUG_MODE:
+			return self.__user
 		return self.user.nickname()
 	
 class Image(db.Model):
 	"""Serve per poter memorizzare le immagini nel datastore"""
 	description = db.StringProperty()
 	link = db.LinkProperty()
+	# MIME type
+	type = db.StringProperty()
 	blob = db.BlobProperty()
 
 class Sector(db.Model):

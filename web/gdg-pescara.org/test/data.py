@@ -1,3 +1,4 @@
+# -*- coding: latin-1 -*-
 import datetime
 
 class TestData(object):
@@ -89,16 +90,16 @@ class TestData(object):
 	
 	listUser = (
 		{
-			'user' : '',
-			'email' : '', 
+			'__user' : 'account1',
+			'__email' : 'account1@domain1.com', 
 			'lastLogin' : '2012-12-12 00:00:00', 
 			'technologies' : list(),
 			'allowsMailing' : True,
 			'id' : None
 		},
 		{
-			'user' : '', 
-			'email' : '', 
+			'__user' : 'AccountTwo', 
+			'__email' : 'account2@domain.due.com', 
 			'lastLogin' : '2013-12-12 11:11:11',
 			'technologies' : list(),
 			'allowsMailing' : True,
@@ -106,61 +107,166 @@ class TestData(object):
 		}
 	)
 	
+# TODO impostare correttamente i mime type	
+	listImages = (
+		{
+			'description' : 'Prima immagine di test', 
+			'link' : 'http://link.alla.prima.immagine/img1.jpg',
+			'blob' : None,
+			'type' : 'image/jpg',
+		},
+		{
+			'description' : 'Seconda immagine di test', 
+			'link' : 'http://seconda.immagine/2.png',
+			'blob' : '',
+			'type' : 'image/png',
+		},
+		{
+			'description' : 'Terza immagine di test', 
+			'link' : 'http://terza.immagine.test/tre.gif',
+			'blob' : '',
+			'type' : 'image/gif',
+		}				
+	)
+	
 	listPost= (
 		{
-			'title' : '',
+			'title' : 'Titolo 1 del primo post',
 			'tags' : list(), 
 			'sector' : None, 
 			'date' : datetime.datetime.now().strftime('%Y-%m-%d 10:12:11'), 
 			'image' : list(),
-			'body' : '', 
+			'body' : u'Questo è il body del post e conterrà  qualcosa di più del semplice testo', 
+			'authors' : list(),
+			'repositoryLink' : list(), 
+			'reference' : list() 
+		},
+		{
+			'title' : 'Titolo 2 del secondo post',
+			'tags' : list(), 
+			'sector' : None, 
+			'date' : datetime.datetime.now().strftime('%Y-%m-%d 10:12:11'), 
+			'image' : list(),
+			'body' : u'Questo Ã¨ il testo del secondo post', 
+			'authors' : list(),
+			'repositoryLink' : list(), 
+			'reference' : list() 
+		},
+		{
+			'title' : 'Titolo 3 del terzo post',
+			'tags' : list(), 
+			'sector' : None, 
+			'date' : datetime.datetime.now().strftime('%Y-%m-%d 10:12:11'), 
+			'image' : list(),
+			'body' : u'Qualcosa di differente rispetto agli altri testi', 
+			'authors' : list(),
+			'repositoryLink' : list(), 
+			'reference' : list() 
+		},
+		{
+			'title' : 'Titolo 4 dell\'ultimo post',
+			'tags' : list(), 
+			'sector' : None, 
+			'date' : datetime.datetime.now().strftime('%Y-%m-%d 10:12:11'), 
+			'image' : list(),
+			'body' : u'E per adesso 5 post sono piÃ¹ che sufficienti', 
 			'authors' : list(),
 			'repositoryLink' : list(), 
 			'reference' : list() 
 		}
+			
 	)
 	
 	listRefer = (
 		{
-			'user' : '',
-			'technology' : '', 
-			'stars' : 0, 
-			'who' : '',
-			'description' : ''
+			'user' : None,
+			'technology' : None, 
+			'stars' : 4, 
+			'who' : None,
+			'description' : 'descrizione uno'
 		},
 		{
-			'user' : '',
-			'technology' : '', 
-			'stars' : 0, 
-			'who' : '',
-			'description' : ''
+			'user' : None,
+			'technology' : None, 
+			'stars' : 1, 
+			'who' : None,
+			'description' : 'altra descrizione'
 		},
 		{
-			'user' : '',
-			'technology' : '', 
-			'stars' : 0, 
-			'who' : '',
-			'description' : ''
+			'user' : None,
+			'technology' : None, 
+			'stars' : 2, 
+			'who' : None,
+			'description' : 'mi sa che...'
 		},
 		{
-			'user' : '',
-			'technology' : '', 
-			'stars' : 0, 
-			'who' : '',
-			'description' : ''
+			'user' : None,
+			'technology' : None, 
+			'stars' : 3, 
+			'who' : None,
+			'description' : 'si sta facendo un po\' tardi'
 		},				
 	)
 	
 	listQuestion = (
 		{
 			'whoMadeTheQuestion' : None, 
-			'body' : '', 
-			'tags' : list(), 
+			'body' : 'N.1 Di che colore era il notebook bianco di Napoleone?', 
+			'tags' : ['TAG1', 'TAG2', 'TAG3', 'bianco', 'TAG5'], 
+			'sector' : list(), 
+			'answer' : None
+		},
+		{
+			'whoMadeTheQuestion' : None, 
+			'body' : 'N.2 Di che colore era il notebook blue di Napoleone?', 
+			'tags' : ['TAG1', 'TAG2', 'TAG3', 'blue', 'TAG5'], 
+			'sector' : list(), 
+			'answer' : None
+		},
+		{
+			'whoMadeTheQuestion' : None, 
+			'body' : 'N.3 Di che colore era il notebook rosso di Napoleone?', 
+			'tags' : ['TAG1', 'TAG2', 'TAG3', 'rosso', 'TAG5'], 
 			'sector' : list(), 
 			'answer' : None
 		}
 	)
 	
-	listQuestionAnswer = ()
-	
-	
+	listQuestionAnswer = (
+		{
+			'body' : 'risposta uno delle question answer', 
+			'rating' : 1, 
+			'dateTime' : '2014-12-12 12:12:13', 
+			'relatedTo' : None, 
+			'who' : None
+		},
+		{
+			'body' : u'risposta due delle question answer, testo un pò esteso', 
+			'rating' : 2, 
+			'dateTime' : '2013-10-10 13:13:13', 
+			'relatedTo' : None,
+			'who' : None
+		},
+		{
+			'body' : u'Altra risposta a questioni oppure ad altre domande', 
+			'rating' : 3, 
+			'dateTime' : '2012-09-09 12:12:12', 
+			'relatedTo' : None, 
+			'who' : None
+		},
+		{
+			'body' : u'Ennesima risposta che deve essere linkata da qualche parte', 
+			'rating' : 4, 
+			'dateTime' : '2011-08-08 11:11:11', 
+			'relatedTo' : None, 
+			'who' : None
+		},
+		{
+			'body' : u'Ancora un\'altra questione che deve essere linkata', 
+			'rating' : 5, 
+			'dateTime' : '2010-07-07 10:10:10', 
+			'relatedTo' : None, 
+			'who' : None
+		},
+						
+	)
